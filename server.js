@@ -27,9 +27,23 @@ app.post('/', (req, res, next) => {
       console.log(err)
       res.status(500).json({
         error: err
-      });
-    });
-});
+      })
+    })
+})
+
+app.get('/:productId', (req, res, next) => {
+  const id = req.params.productId
+  Product.findById(id)
+    .exec()
+    .then(doc => {
+      console.log(doc)
+      res.status(200).json(doc)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({ error: err })
+    })
+})
 
 // app.post('/', (req, res, next) => {
 //   const product = new Product({

@@ -1,39 +1,57 @@
+
 const express = require('express')
 const app = express()
-const collection = require('./collections')
-const Product = require('./collections')
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
+const ProductModel = require('./collections').ProductModel
+const bodyParser = require('body-parser')
 
-app.get('/hello', (req, res, next) => {
-  res.send({ 'Hello': 'true' }, collection.get())
+console.log(ProductModel)
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
+
+app.get('/', (req, res, next) => {
+  res.send({ 'testPassed': 'true' })
+  console.log(req.body)
 })
 
 app.post('/', (req, res, next) => {
-  const product = new Product({
-    _id: new mongoose.Types.ObjectId(),
-    name: 'req.body.name',
-    price: '287'
-  })
-  product
-    .save()
-    .then(result => {
-      console.log(result)
-      res.status(201).json({
-        message: 'Handling POST requests to /products',
-        createdProduct: result
-      });
+  console.log('Brand is ', req.body.brand)
+  console.log('units is ', req.body.units)
+  console.log('expDate is ', req.body.expDate)
+  if (req.body.brand && req.body.units && req.body.expDate) {
+    const product = new ProductModel({
+    // _id: new mongoose.Types.ObjectId(),
+      brand: req.body.brand,
+      units: req.body.units,
+      expDate: req.body.expDate
     })
-    .catch(err => {
-      console.log(err)
-      res.status(500).json({
-        error: err
+    product
+      .save()
+      .then(result => {
+        console.log(result)
+        res.status(201).json({
+          message: 'Handling POST requests to /products',
+          createdProduct: result
+        })
       })
+      .catch(err => {
+        console.log(err)
+        res.status(500).json({
+          error: err
+        })
+      })
+  } else {
+    res.status(400).json({
+      message: 'Some fields are missing'
     })
+  }
 })
 
 app.get('/:productId', (req, res, next) => {
   const id = req.params.productId
-  Product.findById(id)
+  ProductModel.findById(id) //.populate('product')
     .exec()
     .then(doc => {
       console.log(doc)

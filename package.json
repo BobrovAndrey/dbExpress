@@ -10,11 +10,7 @@
   "author": "BobrovAndrey",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "mongodb": "^3.1.13",
+    "express": "^4.16.4",
     "mongoose": "^5.4.12"
-  },
-  "devDependencies": {
-    "express": "^4.16.4"
   }
 }

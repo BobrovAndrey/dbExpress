@@ -31,7 +31,21 @@ app.get('/user/:productId', (req, res, next) => {
     })
 })
 
-app.get('/user/', (req, res, next) => {
+// Find all users
+app.get('/users/', (req, res, next) => {
+  UserModel.find()
+    .then(doc => {
+      console.log(doc)
+      res.status(200).json(doc)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({ error: err })
+    })
+})
+
+// Populate
+app.get('/user', (req, res, next) => {
   UserModel.find()
     .populate('product')
     .exec()
@@ -106,7 +120,7 @@ app.post('/user', (req, res, next) => {
   }
 })
 
-// Delete
+// Delete all
 app.delete('/user/', (req, res, next) => {
   UserModel.remove()
     .exec()
@@ -119,6 +133,43 @@ app.delete('/user/', (req, res, next) => {
       res.status(500).json({ error: err })
     })
 })
+
+// Find one specified user
+app.get('/user/find', (req, res, next) => {
+  const requestName = req.body.name
+  const requestLastname = req.body.lastname
+  UserModel.findOne({ name: `${requestName}`, lastname: `${requestLastname}` })
+    .then(res.status(200).json({
+      userFound: 'true'
+    }))
+    .catch(err => console.log(err))
+})
+
+// Put (replace)
+app.put('/user/:id', (req, res, next) => {
+  const userId = req.params.id
+  const user = {
+    name: req.body.name,
+    lastname: req.body.lastname,
+    salary: req.body.salary,
+    skills: req.body.skills,
+    product: req.body.product
+  }
+  UserModel.findOne({ _id: userId })
+    .then(doc => {
+      console.log('found user id: ', userId)
+      console.log('here is obj: ', doc)
+      console.log('user object is: ', user)
+      UserModel.replaceOne({ _id: userId }, user)
+        .then(doc => {
+          res.status(200).json(doc)
+        })
+    }
+    )
+    .catch(err => console.log(err))
+})
+
+// Patch (modify)
 
 const port = process.env.port || 8080
 app.listen(port, () => console.log(`Server running at ${port} `))
